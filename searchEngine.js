@@ -99,22 +99,16 @@ function getData(id){
 	       	 			console.log("an error occurred");
        	 			}else {
 						var html = "";
-						//convert to json
-						var jsonString = xml2json(data, " ");
-						var json = JSON.parse(jsonString);
-						console.log(json.data);
-						//an array of data of locations
-						var locations = json.data.location;
+						var locations = data.getElementsByTagName("location");
 						console.log(locations);
 						
 						for(var i =0; i < locations.length; i++){
 							html = "<table>";
-							html += "<tr><td>Address:</td><td>" + locations[i].address1 + "</td>";
-							html += "<tr><td>City:</td><td>" + locations[i].city + "</td>";
-							html += "<tr><td>State:</td><td>" + locations[i].state + "</td>";
-							html += "<tr><td>Zip Code:</td><td>" + locations[i].zip + "</td>";
-							html += "<tr><td>Phone:</td><td>" + locations[i].phone + "</td>";
-							html += 
+							html += "<tr><td>Address:</td><td>" + locations[i].getElementsByTagName("address")[0].nodeValue + "</td>";
+							html += "<tr><td>City:</td><td>" + locations[i].getElementsByTagName("city")[0] + "</td>";
+							html += "<tr><td>State:</td><td>" + locations[i].getElementsByTagName("state")[0] + "</td>";
+							html += "<tr><td>Zip Code:</td><td>" + locations[i].getElementsByTagName("zip")[0] + "</td>";
+							html += "<tr><td>Phone:</td><td>" + locations[i].getElementsByTagName("phone")[0] + "</td>";
 							html += "</table>";
 						}
 						
@@ -125,7 +119,37 @@ function getData(id){
 			});
 	}
 	function getTraining(id){
-		$('#info-dump').html('going to get Training of '+id);
+			$.ajax({
+  				type: "GET",
+  				async: true,
+  				cache:false,
+  				url: "proxy.php",
+  				data: {path: "/" + id + "/Training"},  
+  				dataType: "xml",
+  				success: function(data, status){ 
+       	 			var x='';
+       	 			if($(data).find('error').length != 0){
+	       	 			console.log("an error occurred");
+       	 			}else {
+						var html = "";
+						//convert to json
+						var jsonString = xml2json(data, " ");
+						var json = JSON.parse(jsonString);
+						console.log(json.data);
+						var x = parseInt(json.data.count, 10);
+						console.log(x);
+						for(var i =0; i < x; i++){
+							html = "<table>";
+							html +="<tr><td>" + json.data.training[i].type 
+							html += "</td></tr>";
+							html += "</table>";
+						}
+						
+						$('#info-dump').html(html);
+						
+					}
+		   		}
+			});
 	}
 	function getTreatment(id){
 		$('#info-dump').html('going to get Treatment of '+id);
