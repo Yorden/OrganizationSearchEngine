@@ -19,7 +19,7 @@
 			People
 				Path: ...ESD/{orgId}/People
 	*/
-	
+
 ///////////////////////////////////////
 //Build the search functionality.
 //onload, get the cities for the state.
@@ -28,8 +28,8 @@
 		getCities('NY');
 		getOrgTypes();
 	});
-	
-//For now, this will be a select to get the 'tabs' needed for the orgId.   
+
+//For now, this will be a select to get the 'tabs' needed for the orgId.
 // For the project you will do this with tabs from the jQuery UI.
 function getData(id){
 //we need to figure out how many 'tabs' or areas of information this type of org has
@@ -43,7 +43,7 @@ function getData(id){
 			if($(data).find('error').length!=0){
 				//output that server is down/sucks
 			}else{
-				
+				unhideTabs();
 				setWorldOrgId(id);
 				getGeneral(id);
 			}
@@ -76,14 +76,16 @@ function getData(id){
 					x+='<tr><td>website:</td><td>'+$(data).find('website').text()+'</td></tr>';
 					x+='<tr><td>number of members:</td><td>'+$(data).find('nummembers').text()+'</td></tr>';
 					x+='<tr><td>number of calls:</td><td>'+$(data).find('numcalls').text()+'</td></tr></table>';
-					
-/// this line will change slightly when we add the tabs plugin					
+
+/// this line will change slightly when we add the tabs plugin
+					makeTabsInactive();
+					$("#genTab").attr('class', 'active');
 					$('#info-dump').html(x);
 				}
 			}
 		});
 	}
-	
+
 	//Student needs to build these:
 	function getLocations(id){
 			$.ajax({
@@ -91,29 +93,32 @@ function getData(id){
   				async: true,
   				cache:false,
   				url: "proxy.php",
-  				data: {path: "/" + id + "/Locations"},  
+  				data: {path: "/" + id + "/Locations"},
   				dataType: "xml",
-  				success: function(data, status){ 
+  				success: function(data, status){
        	 			var x='';
        	 			if($(data).find('error').length != 0){
 	       	 			console.log("an error occurred");
        	 			}else {
 						var html = "";
 						var locations = data.getElementsByTagName("location");
-						console.log(locations);
-						
-						for(var i =0; i < locations.length; i++){
-							html = "<table>";
-							html += "<tr><td>Address:</td><td>" + locations[i].getElementsByTagName("address")[0].nodeValue + "</td>";
-							html += "<tr><td>City:</td><td>" + locations[i].getElementsByTagName("city")[0] + "</td>";
-							html += "<tr><td>State:</td><td>" + locations[i].getElementsByTagName("state")[0] + "</td>";
-							html += "<tr><td>Zip Code:</td><td>" + locations[i].getElementsByTagName("zip")[0] + "</td>";
-							html += "<tr><td>Phone:</td><td>" + locations[i].getElementsByTagName("phone")[0] + "</td>";
+						var count = $(data).find('count').text();
+						for(var i =0; i < count; i++){
+							html += "<table>";
+							html += "<tr><td></td><td></td>";
+							html += "<tr><td>Location Number: </td><td>" + (i + 1) + "</td>";
+							html += "<tr><td></td><td></td>";
+							html += "<tr><td>Address:</td><td>" + $(locations[i]).find('address1').text() + "</td>";
+							html += "<tr><td>City:</td><td>" + $(locations[i]).find('city').text() + "</td>";
+							html += "<tr><td>State:</td><td>" + $(locations[i]).find('state').text() + "</td>";
+							html += "<tr><td>Zip Code:</td><td>" + $(locations[i]).find('zip').text() + "</td>";
+							html += "<tr><td>County:</td><td>" + $(locations[i]).find('countyName').text() + "</td>";
+							html += "<tr><td>Phone:</td><td>" + $(locations[i]).find('phone').text() + "</td>";
 							html += "</table>";
 						}
-						
+
 						$('#info-dump').html(html);
-						
+
 					}
 		   		}
 			});
@@ -124,44 +129,179 @@ function getData(id){
   				async: true,
   				cache:false,
   				url: "proxy.php",
-  				data: {path: "/" + id + "/Training"},  
+  				data: {path: "/" + id + "/Training"},
   				dataType: "xml",
-  				success: function(data, status){ 
+  				success: function(data, status){
        	 			var x='';
        	 			if($(data).find('error').length != 0){
 	       	 			console.log("an error occurred");
        	 			}else {
 						var html = "";
-						//convert to json
-						var jsonString = xml2json(data, " ");
-						var json = JSON.parse(jsonString);
-						console.log(json.data);
-						var x = parseInt(json.data.count, 10);
-						console.log(x);
-						for(var i =0; i < x; i++){
-							html = "<table>";
-							html +="<tr><td>" + json.data.training[i].type 
-							html += "</td></tr>";
-							html += "</table>";
+						var trainings = data.getElementsByTagName("training");
+						console.log(data);
+						var x = $(data).find('count').text();
+						if(x ==0){
+							html += "There are currently know types of training offered at the selected location.";
+
 						}
-						
+						else{
+							html += "The following types of training are offered at the selected location:";
+
+						}
+						for(var i =0; i < x; i++){
+
+							html += "<table>";
+							html += "<tr><td>Type:</td><td>" + $(trainings[i]).find('abbreviation').text()+ " also known as " + $(trainings[i]).find('type') + "</td>";
+							html += "</table>";
+
+						}
+
 						$('#info-dump').html(html);
-						
+
 					}
 		   		}
 			});
 	}
 	function getTreatment(id){
-		$('#info-dump').html('going to get Treatment of '+id);
+		$.ajax({
+				type: "GET",
+				async: true,
+				cache:false,
+				url: "proxy.php",
+				data: {path: "/" + id + "/Treatments"},
+				dataType: "xml",
+				success: function(data, status){
+						var x='';
+						if($(data).find('error').length != 0){
+							console.log("an error occurred");
+						}else {
+					var html = "";
+					var treatments = data.getElementsByTagName("treatment");
+					var x = $(data).find('count').text();
+					if(x ==0){
+						html += "There are currently know types of treatments offered at the selected location.";
+					}
+					else{
+						html += "The following types of treatments are offered at the selected location:";
+					}
+					for(var i = 0; i < x; i++){
+						html += "<table>";
+						html += "<tr><td>Type:</td><td>" + $(treatments[i]).find('abbreviation').text()+ " also known as " + $(treatments[i]).find('type') + "</td>";
+						html += "</table>";
+					}
+					$('#info-dump').html(html);
+
+				}
+				}
+		});
 	}
 	function getFacilities(id){
-		$('#info-dump').html('going to get Facilities of '+id);
+		$.ajax({
+				type: "GET",
+				async: true,
+				cache:false,
+				url: "proxy.php",
+				data: {path: "/" + id + "/Facilities"},
+				dataType: "xml",
+				success: function(data, status){
+						var x='';
+						if($(data).find('error').length != 0){
+							console.log("an error occurred");
+						}else {
+					var html = "";
+					var facilities = data.getElementsByTagName("facility");
+					var x = $(data).find('count').text();
+					console.log(data);
+					if(x == 0){
+						html += "There are currently no facilities at the selected location.";
+					}
+					else{
+						html += "The following types of facilities are located at the selected location:";
+					}
+					for(var i = 0; i < x; i++){
+						html += "<table>";
+						html += "<tr><td>Type:</td><td>" + $(facilities[i]).find('type').text() +"</td>";
+						html += "<tr><td>Quantity:</td><td>" + $(facilities[i]).find('quantity').text() +"</td>";
+						html += "<tr><td>Description:</td><td>" + $(facilities[i]).find('description').text() +"</td>";
+						html += "</table>";
+					}
+					$('#info-dump').html(html);
+
+				}
+				}
+		});
 	}
 	function getEquipment(id){
-		$('#info-dump').html('going to get Equipment of '+id);
+		$.ajax({
+				type: "GET",
+				async: true,
+				cache:false,
+				url: "proxy.php",
+				data: {path: "/" + id + "/Equipment"},
+				dataType: "xml",
+				success: function(data, status){
+						var x='';
+						if($(data).find('error').length != 0){
+							console.log("an error occurred");
+						}else {
+					var html = "";
+					var equips = data.getElementsByTagName("equipment");
+					var x = $(data).find('count').text();
+					console.log(data);
+					if(x == 0){
+						html += "There is currently no equipment at the selected location.";
+					}
+					else{
+						html += "The following types of equipment are located at the selected location:";
+					}
+					for(var i = 0; i < x; i++){
+						html += "<table>";
+						html += "<tr><td>Type: </td><td>"+ $(equips[i]).find('type').text() +"</td></tr>";
+						html += "<tr><td>Quantity: </td><td>"+ $(equips[i]).find('quantity').text() +"</td></tr>";
+						html += "<tr><td>Description: </td><td>"+ $(equips[i]).find('description').text() +"</td></tr>";
+						html += "</table>";
+					}
+					$('#info-dump').html(html);
+
+				}
+				}
+		});
 	}
 	function getPhysicians(id){
-		$('#info-dump').html('going to get Physicians of '+id);
+		$.ajax({
+				type: "GET",
+				async: true,
+				cache:false,
+				url: "proxy.php",
+				data: {path: "/" + id + "/Equipment"},
+				dataType: "xml",
+				success: function(data, status){
+						var x='';
+						if($(data).find('error').length != 0){
+							console.log("an error occurred");
+						}else {
+					var html = "";
+					var equips = data.getElementsByTagName("equipment");
+					var x = $(data).find('count').text();
+					console.log(data);
+					if(x == 0){
+						html += "There are currently no physicians at the selected location.";
+					}
+					else{
+						html += "The following physicians are located at the selected location:";
+					}
+					for(var i = 0; i < x; i++){
+						html += "<table style='width:100%'>";
+						html += "<tr><td>Type: </td><td>"+ $(equips[i]).find('type').text() +"</td></tr>";
+						html += "<tr><td>Quantity: </td><td>"+ $(equips[i]).find('quantity').text() +"</td></tr>";
+						html += "<tr><td>Description: </td><td>"+ $(equips[i]).find('description').text() +"</td></tr>";
+						html += "</table>";
+					}
+					$('#info-dump').html(html);
+
+				}
+				}
+		});
 	}
 	function getPeople(id){
 		$('#info-dump').html('going to get People of '+id);
@@ -177,9 +317,9 @@ function getData(id){
   				async: true,
   				cache:false,
   				url: "proxy.php",
-  				data: {path: "/Cities?state="+which},  
+  				data: {path: "/Cities?state="+which},
   				dataType: "xml",
-  				success: function(data, status){ 
+  				success: function(data, status){
        	 			var x='';
        	 			if($(data).find('error').length != 0){
 	       	 			//do nothing?
@@ -199,7 +339,7 @@ function getData(id){
 			});
 			}
     	}
-	
+
 //Because the orgTypes could change we load them 'fresh' every time.
 	//In reality you should load these in PHP on the server end (saves a round trip)
 	//but since this is client...
@@ -209,9 +349,9 @@ function getData(id){
   				async: true,
   				cache:false,
   				url: "proxy.php",
-  				data: {path: "/OrgTypes"},  
+  				data: {path: "/OrgTypes"},
   				dataType: "xml",
-  				success: function(data, status){ 
+  				success: function(data, status){
        	 			var x='';
        	 			if($(data).find('error').length != 0){
 	       	 			//do nothing?
@@ -228,8 +368,8 @@ function getData(id){
 		   		}
 			});
     	}
-	
-	//Do a search. 
+
+	//Do a search.
 	//so when an org is clicked it will create the select and getGeneral().
 	function checkSearch(){
 			$.ajax({
@@ -239,13 +379,13 @@ function getData(id){
   				url: "proxy.php",
   				data: {path: "/Organizations?"+$('#Form1').serialize()},
   				dataType: "xml",
-  				success: function(data, status){ 
+  				success: function(data, status){
   					var x='';
        	 			$('#tabelOutput').html('');
        	 			if($(data).find('error').length != 0){
 	       	 			$('error', data).each(
     	   	 				function(){
-       		 				x+="error getting data"; 
+       		 				x+="error getting data";
        	 					}
        	 				);
        	 			}else if($(data).find('row').length==0){
@@ -266,7 +406,7 @@ function getData(id){
        	 				x+="<div><table id=\"myTable\" class=\"tablesorter\" border=\"0\" cellpadding=\"0\" cellspacing=\"1\"><thead><tr><th class=\"header\" style=\"width:90px;\">Type<\/th><th class=\"header\">Name<\/th><th class=\"header\">City<\/th><th class=\"header\">Zip<\/th><th class=\"header\" style=\"width:70px;\">County<\/th><th class=\"header\" style=\"width:40px;\">State<\/th><\/tr><\/thead>";
        	 				$('row',data).each(
        	 					function(){
-       	 						x+='<tr>';
+       	 						x+='<tr class="searchRow">';
        							x+="<td>"+$(this).find('type').text()+"<\/td>";
         						//x+="<td style=\"cursor:pointer;color:#987;\" onclick=\"getData("+$(this).find('OrganizationID').text()+");\">"+$(this).find('Name').text()+"<\/td>";
         						x+="<td style=\"cursor:pointer;color:#987;\" onclick=\"getData("+$(this).find('OrganizationID').text()+");\">"+$(this).find('Name').text()+"<\/td>";
@@ -282,7 +422,7 @@ function getData(id){
 		   		}
 			});
 		}
-	
+
 	//Occasionally we will get back 'null' as a value
 	//you should NEVER show 'null' in the client - make it blank...
 	function myFind(what,data,i){

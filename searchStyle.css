@@ -1,5 +1,52 @@
 body{
 	margin: 0px;
 	padding: 0px;
-	
+}
+
+#Form1{
+	text-align: center;
+	width : 40%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+fieldset{
+}
+
+legend{
+	padding: 0px;
+	margin: 0px;
+	padding-top: 10px;
+	border-style:none;
+
+}
+
+#formSubmit{
+	padding-top: 10px;
+}
+
+#myTable{
+	margin-left: auto;
+	margin-right: auto;
+	width: 50%
+}
+#myTable td{
+	padding: 5px;
+	border: 1px solid #000000;
+
+}
+#myTable .searchRow{
+	padding-top: 50px;
+	margin-top: 50px;
+	border: 1px solid #000000;
+
+}
+.container{
+	padding-top: 20px;
+	width: 55%;
+}
+#navtabbar{
+	margin-left: auto;
+	margin-right: auto;
+	visibility: hidden;
 }
