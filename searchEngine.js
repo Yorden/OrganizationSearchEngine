@@ -31,6 +31,7 @@
 
 //For now, this will be a select to get the 'tabs' needed for the orgId.
 // For the project you will do this with tabs from the jQuery UI.
+
 function getData(id){
 //we need to figure out how many 'tabs' or areas of information this type of org has
 	$.ajax({
@@ -43,9 +44,13 @@ function getData(id){
 			if($(data).find('error').length!=0){
 				//output that server is down/sucks
 			}else{
+				//this else satement handles when someone clicks an organization in the search results
 				window.scrollTo(0,0);
+				//this unhides the tabs
 				unhideTabs();
+				//sets the id value for the utils file
 				setWorldOrgId(id);
+				//this changes the value of the tab and sets it to active
 				getGeneral(id);
 			}
 		}
@@ -63,10 +68,11 @@ function getData(id){
 					var html = "<p>something broke</p>";
 					$('#info-dump').html(html);
 				}else{
+					//gets the info and stes it to the accordion
 					var html = "<div class='accordion'>"
 					html += "<h1 class='accordion-h1'>General Information</h1>";
 					html += "<div>";
-
+					//saving fata
 					html +='<p>Name: '+$(data).find('name').text()+'</p>';
 					html +='<p>Description: '+$(data).find('description').text()+'</p>';
 					html +='<p>Email: '+$(data).find('email').text()+'</p>';
@@ -76,9 +82,9 @@ function getData(id){
 					html += "</div>"
 
 /// this line will change slightly when we add the tabs plugin
-					makeTabsInactive();
-					$("#genTab").attr('class', 'active');
-					$('#info-dump').html(x);
+					$('#info-dump').html(html);
+					$(".accordion").accordion();
+
 				}
 			}
 		});
@@ -101,7 +107,7 @@ function getData(id){
 						var html = "";
 						var locations = data.getElementsByTagName("location");
 						var count = $(data).find('count').text();
-
+						//data is also stored in an accordion
 						html += "<div class='accordion'>"
 								html += "<h1 class='accordion-h1'>" + $(locations[0]).find('address1').text() + "</h1>";
 								html += "<div>";
@@ -112,12 +118,13 @@ function getData(id){
 								html += "<p>Phone: " +  $(locations[0]).find('phone').text() + "</p>";
 								var addressSplit = $(locations[0]).find('address1').text().split(" ");
 								var APIDestiantion = "";
+								//this for loop creates the string that will be appended to the iframes URL to get the map
 								for(var i = 0; i < addressSplit.length; i++){
 									APIDestiantion += addressSplit[i] + "+";
 									APIDestiantion += $(locations[0]).find('city').text() + "+";
 									APIDestiantion += $(locations[0]).find('state').text();
 								}
-
+								//sets the Iframe
 								html += '<iframe width="600" height="450" frameborder="0" style="border:0" src="https://www.google.com/maps/embed/v1/place?key=AIzaSyC4I-gsw1gWKhOtg9O410xHHCxlOWm7rMw&q='+APIDestiantion+'"&zoom=18 allowfullscreen></iframe>'
 								html += "</div>";
 
@@ -155,7 +162,9 @@ function getData(id){
 							html += "The following types of training are offered at the selected location:";
 
 						}
+						//stored in an accordion
 						html += "<div class='accordion'>";
+						//for each type of training create a new accordion
 						for(var i =0; i < x; i++){
 							html += "<h1 class='accordion-h1'>" + $(trainings[i]).find('abbreviation').text() + "</h1>"
 							html += "<div>"
@@ -194,6 +203,7 @@ function getData(id){
 					else{
 						html += "The following types of treatments are offered at the selected location:";
 					}
+					//for each type of treatment add a new accordion
 					html += "<div class='accordion'>"
 					for(var i = 0; i < x; i++){
 						console.log($(treatments[i]).find('type').text())
@@ -225,15 +235,17 @@ function getData(id){
 							console.log("an error occurred");
 						}else {
 					var html = "";
+					//get data
 					var facilities = data.getElementsByTagName("facility");
 					var x = $(data).find('count').text();
-					console.log(data);
+					//if there are no facilities
 					if(x == 0){
 						html += "There are currently no facilities at the selected location.";
 					}
 					else{
 						html += "The following types of facilities are located at the selected location:";
 					}
+
 					html += "<div class='accordion'>";
 					for(var i = 0; i < x; i++){
 						html += "<h1 class='accordion-h1'>" + $(facilities[i]).find('type').text() + "</h1>";
@@ -252,6 +264,7 @@ function getData(id){
 				}
 		});
 	}
+	//get the equpment
 	function getEquipment(id){
 		$.ajax({
 				type: "GET",
@@ -266,19 +279,22 @@ function getData(id){
 							console.log("an error occurred");
 						}else {
 					var html = "";
+					//get data
 					var equips = data.getElementsByTagName("equipment");
 					var x = $(data).find('count').text();
-					console.log(data);
+					//if there is no data
 					if(x == 0){
 						html += "There is currently no equipment at the selected location.";
 					}
 					else{
 						html += "The following types of equipment are located at the selected location:";
 					}
+					//store info in accordion
 					html += "<div class='accordion'>"
 					for(var i = 0; i < x; i++){
 						html += "<h1 class='accordion-h1'>" + $(equips[i]).find('type').text() + "</h1>" ;
 						html += "<div>";
+						//check if the values are null
 						if($(equips[i]).find('quantity').text() != 'null'){
 							html += "<p>Quantity: " + $(equips[i]).find('quantity').text() + "</p>";
 						}
@@ -286,7 +302,7 @@ function getData(id){
 							html += "<p>Quantity: None available.</p>";
 						}
 
-
+						//check if values are null
 						if($(equips[i]).find('description').text() != 'null'){
 							html += "<p>Description: " + $(equips[i]).find('description').text() + "</p>";
 						}
@@ -318,17 +334,20 @@ function getData(id){
 							console.log("an error occurred");
 						}else {
 					var html = "";
+					//get the data
 					var physicians = data.getElementsByTagName("physician");
 					var x = $(data).find('count').text();
-					console.log(data);
+					//chec if there is any data to display
 					if(x == 0){
 						html += "There are currently no physicians at the selected location.";
 					}
 					else{
 						html += "The following physicians are located at the selected location:";
 					}
+					//save info in accordion
 					html+= "<div class='accordion'>"
 						for(var i = 0; i < x; i++){
+							//save in a separate accordions for each physician
 							html += "<h1 class='accordion-h1'>" + $(physicians[i]).find('fName').text() + " " + $(physicians[i]).find('mName').text() +  " " + $(physicians[i]).find('fName').text() + "</h1>" ;
 							html += "<div>";
 							html += "<p>Phone: "+ $(physicians[i]).find('phone').text() +"</p>";
@@ -361,28 +380,34 @@ function getData(id){
 					var html = "";
 					var sites = data.getElementsByTagName("site");
 					var siteCount = $(data).find('siteCount').text();
-					console.log(data);
+					//get the sites data and if there are no sites there are no people
 					if(sites == 0){
 						html += "There are currently no people at the selected location.";
 					}
 					else{
 						html += "The following people are located at the following locations:";
 					}
-					html += "<div class='accordion'>"
+					//foreach site
+					html += "<div class='accordion'>";
 					for(var j = 0; j < siteCount; j++){
+						//set the site
 						var site = sites[j];
+						//get the count of the people and the numberof people
 						var personCount = $(site).find('personCount').text();
 						var people = site.getElementsByTagName("person");
+						//set the address att to a h2 element
 						html += "<h2>"+$(site).attr("address")+"</h2>";
 						if(personCount == 0){
 							html += "<p>There are no people currently here.</p>";
 						}
 						for(var i = 0; i < personCount; i++){
+							//for every person save them in an accordion class
 							html += "<h1 class='accordion-h1'>"+ $(people[i]).find('fName').text()+" "+$(people[i]).find('lName').text()+"</h1>"
 							html += "<div>";
 							html += "<p>" + $(people[i]).find('role').text() +"</p>";
 							html += "<p>" + $(people[i]).find('honorific').text() +"</p>";
 							html += "<h3>Contact Methods</h3>";
+							//for the contact methods save them as p tags
 							var contacts = $(people[i]).find('contactMethods').find('method');
 							if(contacts.length == 0){
 								html += "<p>There is no contact information for this individual.</p>";
@@ -397,6 +422,7 @@ function getData(id){
 						}
 					}
 					html += "</div>"
+					//place the info on the page
 					$('#info-dump').html(html);
 					$(".accordion").accordion();
 
