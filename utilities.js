@@ -1,4 +1,5 @@
 
+//used to change the tabs and the information in the tabs
 var changeTab = function(tab){
 	console.log(tab);
 	makeTabsInactive();
@@ -45,6 +46,7 @@ var changeTab = function(tab){
 	}
 };
 //makes all the tabs inactive
+//used for when the user selects a tab
 var makeTabsInactive = function(){
 	$("#navtabbar li").each(function(i){
 		$(this).attr('class', "");
@@ -56,7 +58,7 @@ var makeTabsInactive = function(){
 var setWorldOrgId = function(id){
 	ID = id;
 }
-
+//unhides the the tabs after the user has selected something
 var unhideTabs = function(){
 	$("#navtabbar").css("visibility", "visible")
 }

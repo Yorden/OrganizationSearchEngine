@@ -43,6 +43,7 @@ function getData(id){
 			if($(data).find('error').length!=0){
 				//output that server is down/sucks
 			}else{
+				window.scrollTo(0,0);
 				unhideTabs();
 				setWorldOrgId(id);
 				getGeneral(id);
@@ -59,23 +60,20 @@ function getData(id){
 			dataType:'xml',
 			success:function(data){
 				if($(data).find('error').length!=0){
-				//do something....
+					var html = "<p>something broke</p>";
+					$('#info-dump').html(html);
 				}else{
-//make a table from the XML, the following comments shows what the xml looks like:
-//<data>
-//<name>Some Hospital</name>
-//<description>Something cool here about the hospital</description>
-//<email>sf@lkj.sdf</email>
-//<website>http://www.rit.edu</website>
-//<nummembers>33</nummembers>
-//<numcalls>300</numcalls>
-//</data>
-					var x='<table><tr><td>Name:</td><td>'+$(data).find('name').text()+'</td></tr>';
-					x+='<tr><td>Description:</td><td>'+$(data).find('description').text()+'</td></tr>';
-					x+='<tr><td>email:</td><td>'+$(data).find('email').text()+'</td></tr>';
-					x+='<tr><td>website:</td><td>'+$(data).find('website').text()+'</td></tr>';
-					x+='<tr><td>number of members:</td><td>'+$(data).find('nummembers').text()+'</td></tr>';
-					x+='<tr><td>number of calls:</td><td>'+$(data).find('numcalls').text()+'</td></tr></table>';
+					var html = "<div class='accordion'>"
+					html += "<h1 class='accordion-h1'>General Information</h1>";
+					html += "<div>";
+
+					html +='<p>Name: '+$(data).find('name').text()+'</p>';
+					html +='<p>Description: '+$(data).find('description').text()+'</p>';
+					html +='<p>Email: '+$(data).find('email').text()+'</p>';
+					html +='<p>Website: '+$(data).find('website').text()+'</p>';
+					html +='<p>Number of Member: '+$(data).find('nummembers').text()+'</p>';
+					html +='<p>Number of Calls: '+$(data).find('numcalls').text()+'</p>';
+					html += "</div>"
 
 /// this line will change slightly when we add the tabs plugin
 					makeTabsInactive();
@@ -103,21 +101,30 @@ function getData(id){
 						var html = "";
 						var locations = data.getElementsByTagName("location");
 						var count = $(data).find('count').text();
-						for(var i =0; i < count; i++){
-							html += "<table>";
-							html += "<tr><td></td><td></td>";
-							html += "<tr><td>Location Number: </td><td>" + (i + 1) + "</td>";
-							html += "<tr><td></td><td></td>";
-							html += "<tr><td>Address:</td><td>" + $(locations[i]).find('address1').text() + "</td>";
-							html += "<tr><td>City:</td><td>" + $(locations[i]).find('city').text() + "</td>";
-							html += "<tr><td>State:</td><td>" + $(locations[i]).find('state').text() + "</td>";
-							html += "<tr><td>Zip Code:</td><td>" + $(locations[i]).find('zip').text() + "</td>";
-							html += "<tr><td>County:</td><td>" + $(locations[i]).find('countyName').text() + "</td>";
-							html += "<tr><td>Phone:</td><td>" + $(locations[i]).find('phone').text() + "</td>";
-							html += "</table>";
-						}
+
+						html += "<div class='accordion'>"
+								html += "<h1 class='accordion-h1'>" + $(locations[0]).find('address1').text() + "</h1>";
+								html += "<div>";
+								html += "<p>Type: " +  $(locations[0]).find('type').text() + "</p>";
+								html += "<p>Address One: " +  $(locations[0]).find('address1').text() + "</p>";
+								html += "<p>City: " +  $(locations[0]).find('city').text() + "," + $(locations[0]).find('state').text() + "</p>";
+								html += "<p>Zip: " +  $(locations[0]).find('zip').text() + "</p>";
+								html += "<p>Phone: " +  $(locations[0]).find('phone').text() + "</p>";
+								var addressSplit = $(locations[0]).find('address1').text().split(" ");
+								var APIDestiantion = "";
+								for(var i = 0; i < addressSplit.length; i++){
+									APIDestiantion += addressSplit[i] + "+";
+									APIDestiantion += $(locations[0]).find('city').text() + "+";
+									APIDestiantion += $(locations[0]).find('state').text();
+								}
+
+								html += '<iframe width="600" height="450" frameborder="0" style="border:0" src="https://www.google.com/maps/embed/v1/place?key=AIzaSyC4I-gsw1gWKhOtg9O410xHHCxlOWm7rMw&q='+APIDestiantion+'"&zoom=18 allowfullscreen></iframe>'
+								html += "</div>";
+
+						html += "</div>"
 
 						$('#info-dump').html(html);
+						$(".accordion").accordion();
 
 					}
 		   		}
@@ -148,15 +155,18 @@ function getData(id){
 							html += "The following types of training are offered at the selected location:";
 
 						}
+						html += "<div class='accordion'>";
 						for(var i =0; i < x; i++){
-
-							html += "<table>";
-							html += "<tr><td>Type:</td><td>" + $(trainings[i]).find('abbreviation').text()+ " also known as " + $(trainings[i]).find('type') + "</td>";
-							html += "</table>";
+							html += "<h1 class='accordion-h1'>" + $(trainings[i]).find('abbreviation').text() + "</h1>"
+							html += "<div>"
+							html += "<p>Other information: "+$(trainings[i]).find('type').text()+"</p>"
+							html += "</div>"
 
 						}
+						html += "</div>"
 
 						$('#info-dump').html(html);
+						$(".accordion").accordion();
 
 					}
 		   		}
@@ -178,18 +188,24 @@ function getData(id){
 					var html = "";
 					var treatments = data.getElementsByTagName("treatment");
 					var x = $(data).find('count').text();
-					if(x ==0){
+					if(x == 0){
 						html += "There are currently know types of treatments offered at the selected location.";
 					}
 					else{
 						html += "The following types of treatments are offered at the selected location:";
 					}
+					html += "<div class='accordion'>"
 					for(var i = 0; i < x; i++){
-						html += "<table>";
-						html += "<tr><td>Type:</td><td>" + $(treatments[i]).find('abbreviation').text()+ " also known as " + $(treatments[i]).find('type') + "</td>";
-						html += "</table>";
+						console.log($(treatments[i]).find('type').text())
+						html += "<h1 class='accordion-h1'>" +  $(treatments[i]).find('abbreviation').text() + "</h1>"
+						html += "<div>"
+						html += "<p>" + $(treatments[i]).find('type').text() + "</p>";
+						html += "</div>"
 					}
+					html += "</div>"
+
 					$('#info-dump').html(html);
+					$(".accordion").accordion();
 
 				}
 				}
@@ -218,14 +234,19 @@ function getData(id){
 					else{
 						html += "The following types of facilities are located at the selected location:";
 					}
+					html += "<div class='accordion'>";
 					for(var i = 0; i < x; i++){
-						html += "<table>";
-						html += "<tr><td>Type:</td><td>" + $(facilities[i]).find('type').text() +"</td>";
-						html += "<tr><td>Quantity:</td><td>" + $(facilities[i]).find('quantity').text() +"</td>";
-						html += "<tr><td>Description:</td><td>" + $(facilities[i]).find('description').text() +"</td>";
-						html += "</table>";
+						html += "<h1 class='accordion-h1'>" + $(facilities[i]).find('type').text() + "</h1>";
+						html += "<div>";
+						html += "<p>Quantity: "+ $(facilities[i]).find('quantity').text() +"</p>";
+						html += "<p>Description: "+ $(facilities[i]).find('description').text() +"</p>";
+
+						html += "</div>";
+
 					}
+					html += "</div>";
 					$('#info-dump').html(html);
+					$(".accordion").accordion();
 
 				}
 				}
@@ -254,14 +275,30 @@ function getData(id){
 					else{
 						html += "The following types of equipment are located at the selected location:";
 					}
+					html += "<div class='accordion'>"
 					for(var i = 0; i < x; i++){
-						html += "<table>";
-						html += "<tr><td>Type: </td><td>"+ $(equips[i]).find('type').text() +"</td></tr>";
-						html += "<tr><td>Quantity: </td><td>"+ $(equips[i]).find('quantity').text() +"</td></tr>";
-						html += "<tr><td>Description: </td><td>"+ $(equips[i]).find('description').text() +"</td></tr>";
-						html += "</table>";
+						html += "<h1 class='accordion-h1'>" + $(equips[i]).find('type').text() + "</h1>" ;
+						html += "<div>";
+						if($(equips[i]).find('quantity').text() != 'null'){
+							html += "<p>Quantity: " + $(equips[i]).find('quantity').text() + "</p>";
+						}
+						else {
+							html += "<p>Quantity: None available.</p>";
+						}
+
+
+						if($(equips[i]).find('description').text() != 'null'){
+							html += "<p>Description: " + $(equips[i]).find('description').text() + "</p>";
+						}
+						else {
+							html += "<p>Description: None available.</p>";
+						}
+						html += "</div>";
+
 					}
+					html += "</div>";
 					$('#info-dump').html(html);
+					$(".accordion").accordion();
 
 				}
 				}
@@ -273,7 +310,7 @@ function getData(id){
 				async: true,
 				cache:false,
 				url: "proxy.php",
-				data: {path: "/" + id + "/Equipment"},
+				data: {path: "/" + id + "/Physicians"},
 				dataType: "xml",
 				success: function(data, status){
 						var x='';
@@ -281,7 +318,7 @@ function getData(id){
 							console.log("an error occurred");
 						}else {
 					var html = "";
-					var equips = data.getElementsByTagName("equipment");
+					var physicians = data.getElementsByTagName("physician");
 					var x = $(data).find('count').text();
 					console.log(data);
 					if(x == 0){
@@ -290,21 +327,83 @@ function getData(id){
 					else{
 						html += "The following physicians are located at the selected location:";
 					}
-					for(var i = 0; i < x; i++){
-						html += "<table style='width:100%'>";
-						html += "<tr><td>Type: </td><td>"+ $(equips[i]).find('type').text() +"</td></tr>";
-						html += "<tr><td>Quantity: </td><td>"+ $(equips[i]).find('quantity').text() +"</td></tr>";
-						html += "<tr><td>Description: </td><td>"+ $(equips[i]).find('description').text() +"</td></tr>";
-						html += "</table>";
+					html+= "<div class='accordion'>"
+						for(var i = 0; i < x; i++){
+							html += "<h1 class='accordion-h1'>" + $(physicians[i]).find('fName').text() + " " + $(physicians[i]).find('mName').text() +  " " + $(physicians[i]).find('fName').text() + "</h1>" ;
+							html += "<div>";
+							html += "<p>Phone: "+ $(physicians[i]).find('phone').text() +"</p>";
+							html += "<p>License: "+ $(physicians[i]).find('license').text() +"</p>";
+							html += "</div>";
+						}
+						html += "</div>";
+						$('#info-dump').html(html);
+						$(".accordion").accordion();
+
+
 					}
+				}
+
+		});
+	}
+	function getPeople(id){
+		$.ajax({
+				type: "GET",
+				async: true,
+				cache:false,
+				url: "proxy.php",
+				data: {path: "/" + id + "/People"},
+				dataType: "xml",
+				success: function(data, status){
+						var x='';
+						if($(data).find('error').length != 0){
+							console.log("an error occurred");
+						}else {
+					var html = "";
+					var sites = data.getElementsByTagName("site");
+					var siteCount = $(data).find('siteCount').text();
+					console.log(data);
+					if(sites == 0){
+						html += "There are currently no people at the selected location.";
+					}
+					else{
+						html += "The following people are located at the following locations:";
+					}
+					html += "<div class='accordion'>"
+					for(var j = 0; j < siteCount; j++){
+						var site = sites[j];
+						var personCount = $(site).find('personCount').text();
+						var people = site.getElementsByTagName("person");
+						html += "<h2>"+$(site).attr("address")+"</h2>";
+						if(personCount == 0){
+							html += "<p>There are no people currently here.</p>";
+						}
+						for(var i = 0; i < personCount; i++){
+							html += "<h1 class='accordion-h1'>"+ $(people[i]).find('fName').text()+" "+$(people[i]).find('lName').text()+"</h1>"
+							html += "<div>";
+							html += "<p>" + $(people[i]).find('role').text() +"</p>";
+							html += "<p>" + $(people[i]).find('honorific').text() +"</p>";
+							html += "<h3>Contact Methods</h3>";
+							var contacts = $(people[i]).find('contactMethods').find('method');
+							if(contacts.length == 0){
+								html += "<p>There is no contact information for this individual.</p>";
+							}
+							else{
+								for(var k = 0; k < contacts.length; k++){
+										html += "<p>" + $(contacts[k]).find('type') + ": " + $(contacts[k]).find('value') + "</p>";
+								}
+							}
+
+							html += "</div>";
+						}
+					}
+					html += "</div>"
 					$('#info-dump').html(html);
+					$(".accordion").accordion();
+
 
 				}
 				}
 		});
-	}
-	function getPeople(id){
-		$('#info-dump').html('going to get People of '+id);
 	}
 
 	//This function is called when user changes the state select (and onload)
@@ -419,6 +518,7 @@ function getData(id){
        	 				x+="<\/table>";
        	 			}
 		     		$('#tabelOutput').html(x);
+						$('#myTable').DataTable();
 		   		}
 			});
 		}

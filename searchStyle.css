@@ -5,14 +5,24 @@ body{
 
 #Form1{
 	text-align: center;
-	width : 40%;
+	width : 60%;
 	margin-left: auto;
 	margin-right: auto;
 }
 
 fieldset{
 }
-
+input{
+	width: 50%;
+	height: 25px;
+}
+select{
+	width: 50%;
+	height: 25px;
+}
+#btnSearch{
+	margin-bottom: 10px;
+}
 legend{
 	padding: 0px;
 	margin: 0px;
@@ -24,29 +34,51 @@ legend{
 #formSubmit{
 	padding-top: 10px;
 }
-
+#myTable_wrapper{
+	width: 55%;
+	margin-left: auto;
+	margin-right: auto;
+}
 #myTable{
 	margin-left: auto;
 	margin-right: auto;
-	width: 50%
+
 }
 #myTable td{
 	padding: 5px;
-	border: 1px solid #000000;
+	border: 1px solid #555555;
 
 }
 #myTable .searchRow{
 	padding-top: 50px;
 	margin-top: 50px;
-	border: 1px solid #000000;
+	border: 1px solid #555555;
 
 }
 .container{
 	padding-top: 20px;
-	width: 55%;
-}
-#navtabbar{
+	width: 50%;
 	margin-left: auto;
 	margin-right: auto;
+	margin-bottom: 50px;
+
+}
+.accordion-h1{
+	font-size: 12px;
+	margin-bottom: 5px;
+}
+.accordion-header{
+	height: 35px;
+}
+#navtabbar{
 	visibility: hidden;
+}
+.nav-tabs li {
+    float:none;
+    display:inline-block;
+    *display:inline; /* ie7 fix */
+     zoom:1; /* hasLayout ie7 trigger */
+}
+.nav-tabs{
+    text-align:center;
 }
